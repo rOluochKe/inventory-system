@@ -1,0 +1,14 @@
+[SUPPLIERS]
+id|name|contact|email
+1|Mouser|John Doe|john@mouser.com
+2|DigiKey|Jane Roe|jane@digikey.com
+
+[PRODUCTS]
+id|sku|name|category|quantity|reorder_level|price|supplier_id
+1|R-100|Resistor 100Ohm|Passive|500|100|0.05|1
+2|C-10u|Capacitor 10uF|Passive|20|50|0.12|2
+
+[TRANSACTIONS]
+id|product_id|type|quantity|timestamp|note
+1|1|ADJ|500|2026-09-29T12:00:00|Initial stock
+2|2|ADJ|20|2026-09-29T12:00:00|Sale
