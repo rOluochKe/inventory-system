@@ -1,4 +1,5 @@
 #include <cassert>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <cstdio>
@@ -125,6 +126,26 @@ static void testMalformedLineIsSkipped() {
     std::remove(path.c_str());
 }
 
+static void testSafeSaveReplacesFile() {
+    const std::string path = "test_safesave.dat";
+    std::remove(path.c_str());
+    Inventory inv;
+    Product p; p.sku = "A"; p.quantity = 1; inv.addProduct(p);
+    Persistence per(path);
+    std::string err;
+    assert(per.save(inv, err));
+    assert(std::filesystem::exists(path));
+    assert(!std::filesystem::exists(path + ".tmp"));
+    std::remove(path.c_str());
+}
+
+static void testTimestampFormat() {
+    const std::string s = "2026-10-01T12:34:56";
+    assert(s.size() == 19);
+    assert(s[10] == 'T');
+    assert(s[4]  == '-' && s[7] == '-');
+}
+
 int main() {
     testAddProduct();
     testDuplicateSkuRejected();
@@ -137,6 +158,8 @@ int main() {
     testPersistenceRoundTrip();
     testLoadMissingFileIsOk();
     testMalformedLineIsSkipped();
+    testSafeSaveReplacesFile();
+    testTimestampFormat();
     std::cout << "All tests passed.\n";
     return 0;
 }

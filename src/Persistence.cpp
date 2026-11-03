@@ -105,9 +105,10 @@ bool Persistence::save(const Inventory& inv, std::string& errorMessage) const {
         std::filesystem::create_directories(p.parent_path(), ec);
     }
 
-    std::ofstream out(path_, std::ios::trunc);
+    const std::string tmp = path_ + ".tmp";
+    std::ofstream out(tmp, std::ios::trunc);
     if (!out.is_open()) {
-        errorMessage = "Cannot open file for writing: " + path_;
+        errorMessage = "Cannot open temp file for writing: " + tmp;
         return false;
     }
 
@@ -119,10 +120,10 @@ bool Persistence::save(const Inventory& inv, std::string& errorMessage) const {
 
     out << "\n[PRODUCTS]\n";
     out << "id|sku|name|category|quantity|reorder_level|price|supplier_id\n";
-    for (const auto& p : inv.products()) {
-        out << p.id << '|' << p.sku << '|' << p.name << '|' << p.category << '|'
-            << p.quantity << '|' << p.reorderLevel << '|' << p.price << '|'
-            << p.supplierId << '\n';
+    for (const auto& p2 : inv.products()) {
+        out << p2.id << '|' << p2.sku << '|' << p2.name << '|' << p2.category << '|'
+            << p2.quantity << '|' << p2.reorderLevel << '|' << p2.price << '|'
+            << p2.supplierId << '\n';
     }
 
     out << "\n[TRANSACTIONS]\n";
@@ -132,7 +133,26 @@ bool Persistence::save(const Inventory& inv, std::string& errorMessage) const {
             << t.quantity << '|' << t.timestamp << '|' << t.note << '\n';
     }
 
-    return static_cast<bool>(out);
+    out.close();
+    if (!out) {
+        errorMessage = "Write failed for " + tmp;
+        std::filesystem::remove(tmp);
+        return false;
+    }
+
+    std::error_code ec;
+    std::filesystem::rename(tmp, path_, ec);
+    if (ec) {
+        // On some platforms rename does not overwrite; fall back.
+        std::filesystem::remove(path_, ec);
+        std::filesystem::rename(tmp, path_, ec);
+        if (ec) {
+            errorMessage = "Rename failed: " + ec.message();
+            std::filesystem::remove(tmp);
+            return false;
+        }
+    }
+    return true;
 }
 
 } // namespace inventory

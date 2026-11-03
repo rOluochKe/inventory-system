@@ -1,3 +1,5 @@
+#include <chrono>
+#include <ctime>
 #include <iostream>
 #include <limits>
 #include <string>
@@ -7,6 +9,21 @@
 #include "inventory/Report.h"
 #include <algorithm>
 
+namespace {
+std::string nowIso8601() {
+    using namespace std::chrono;
+    auto t  = system_clock::to_time_t(system_clock::now());
+    std::tm tm{};
+#if defined(_WIN32)
+    localtime_s(&tm, &t);
+#else
+    localtime_r(&t, &tm);
+#endif
+    char buf[32];
+    std::strftime(buf, sizeof buf, "%Y-%m-%dT%H:%M:%S", &tm);
+    return buf;
+    }
+}
 using namespace inventory;
 
 namespace {
@@ -90,7 +107,11 @@ void productsMenu(Inventory& inv) {
             else                    std::cout << "  ! Update failed.\n";
         } else if (c == 3) {
             int id = readInt("Product id: ");
-            std::cout << (inv.removeProduct(id) ? "  + Removed.\n" : "  ! Not found.\n");
+            const Product* p = inv.findProductById(id);
+            if (!p) { std::cout << "  ! Not found.\n"; continue; }
+            std::string conf = readLine("Delete '" + p->name + "'? (y/N): ");
+            if (conf != "y" && conf != "Y") { std::cout << "  Cancelled.\n"; continue; }
+            std::cout << (inv.removeProduct(id) ? "  + Removed.\n" : "  ! Failed.\n");
         } else if (c == 4) {
             printProducts(inv.listProducts());
         } else if (c == 5) {
@@ -130,8 +151,12 @@ void suppliersMenu(Inventory& inv) {
             std::cout << (inv.addSupplier(s) ? "  + Added.\n" : "  ! Duplicate id.\n");
         } else if (c == 2) {
             int id = readInt("Supplier id: ");
+            const Supplier* s = inv.findSupplierById(id);
+            if (!s) { std::cout << "  ! Not found.\n"; continue; }
+            std::string conf = readLine("Delete supplier '" + s->name + "'? (y/N): ");
+            if (conf != "y" && conf != "Y") { std::cout << "  Cancelled.\n"; continue; }
             if (!inv.removeSupplier(id))
-                std::cout << "  ! Not found, or still referenced by a product.\n";
+                std::cout << "  ! Still referenced by a product.\n";
             else
                 std::cout << "  + Removed.\n";
         } else if (c == 3) {
@@ -153,7 +178,7 @@ void transactionsMenu(Inventory& inv) {
         t.productId = readInt("Product id: ");
         t.quantity  = readInt("Quantity: ");
         t.note      = readLine("Note: ");
-        t.timestamp = "2026-09-29T12:00:00"; // replace with a real clock later
+        t.timestamp = nowIso8601();
         if (c == 1) t.type = TransactionType::StockIn;
         if (c == 2) t.type = TransactionType::StockOut;
         if (c == 3) t.type = TransactionType::Adjustment;

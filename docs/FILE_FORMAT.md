@@ -5,14 +5,17 @@ lines beginning with `#` are ignored. Sections appear in this order:
 `[SUPPLIERS]`, `[PRODUCTS]`, `[TRANSACTIONS]`.
 
 ## [SUPPLIERS]
+
 Header: id|name|contact|email
 1|Mouser|John Doe|john@mouser.com
 
 ## [PRODUCTS]
+
 Header: id|sku|name|category|quantity|reorder_level|price|supplier_id
 1|R-100|Resistor 100Ohm|Passive|500|100|0.05|1
 
 ## [TRANSACTIONS]
+
 Header: id|product_id|type|quantity|timestamp|note
 1|1|IN|500|2026-09-18T10:00:00|Initial stock
 
@@ -20,6 +23,7 @@ Header: id|product_id|type|quantity|timestamp|note
 the field must still be present (trailing `|`).
 
 ## Error handling
+
 - Missing file: application starts with an empty inventory.
 - Malformed line: skipped; a warning is written to stderr; parsing continues.
 - Unknown section header: ignored.

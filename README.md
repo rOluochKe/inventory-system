@@ -15,6 +15,8 @@ runs.
 - cmake -S . -B build
 - cmake --build build
 
+ctest --test-dir build --output-on-failure
+
 ```bash
 The build produces:
 - `build/libinventory_core.a` — the reusable library
@@ -77,9 +79,9 @@ inventory-system/
 │ ├── CODEBOOK.md # public API and data structures
 │ └── FILE_FORMAT.md # on-disk format specification
 └── data/
-└── inventory.dat # sample data file
-└── Component-Diagram # System flow diagram
-└── UML-Class-Diagram # System ER Diagram
+│ ├── inventory.dat # sample data file
+└── component-diagram.pdf # System flow diagram
+└── uml-class-diagram.pdf # System ER Diagram
 ```
 
 ## Documentation
@@ -126,9 +128,8 @@ raw pointers and no manual `new`/`delete`.
 - Phase 1 — conception document and initial build skeleton. ✔
 - Phase 2 — full CLI, persistence, expanded tests, code book, and file-format
   spec. ✔
-- Phase 3 — hardening, final abstract, demo video, and ZIP submission.
-  (pending)
-
+- Phase 3 — hardening, final abstract, demo video, and ZIP submission. ✔
+  
 ## Changes since Phase 1
 
 - Added `docs/CODEBOOK.md` and `docs/FILE_FORMAT.md`.
