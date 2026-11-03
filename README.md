@@ -130,16 +130,6 @@ raw pointers and no manual `new`/`delete`.
   spec. ✔
 - Phase 3 — hardening, final abstract, demo video, and ZIP submission. ✔
   
-## Changes since Phase 1
-
-- Added `docs/CODEBOOK.md` and `docs/FILE_FORMAT.md`.
-- Persistence loader now collects a warning string instead of aborting on the
-  first malformed line — a defensive choice that more directly matches the
-  "handle a malformed file gracefully" requirement.
-- Expanded the test suite to 11 tests covering all required edge cases.
-- Completed the two-level CLI menu and added a typed-input helper that
-  re-prompts on non-numeric input.
-
 ## License
 
 Coursework submission for IU Internationale Hochschule. Not for redistribution.
